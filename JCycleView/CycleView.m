@@ -29,6 +29,7 @@
 
 
 @implementation CycleView
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame])
@@ -41,7 +42,7 @@
         _timer = [NSTimer timerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
             [_scrollView setContentOffset:CGPointMake(self.frame.size.width * 3, 0) animated:YES];
         }];
-        [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSDefaultRunLoopMode];
+        [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
         
         UIButton * btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
         [btn addTarget:self action:@selector(clickBtn) forControlEvents:UIControlEventTouchUpInside];
@@ -65,7 +66,8 @@
         UIImageView * imageView = [[UIImageView alloc] initWithFrame:(CGRect){n * ThisViewWidth, 0, ThisViewWidth, ThisViewHeight}];
         n ++;
         imageView.image = _imageData[[self returnImage:index]];//[self returnImage:index];
-        
+        NSLog(@"tag ========== %ld",[self returnImage:index]);
+        imageView.tag = [self returnImage:index];
         [self.scrollView addSubview:imageView];
         
     }
@@ -156,32 +158,22 @@
         [imageArray enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([obj hasPrefix:@"http"])
             {
-                UIImage * img = [cycle imageWithStr:obj];
-            
-                if ( img)//idx == 0 &&
+                UIImage * img = [cycle downloadImageWithStr:obj];
+                cycle.imageData[idx] = img;
+                
+                if (img)
                 {
-
                     dispatch_async(dispatch_get_main_queue(), ^{
-//                        imgView.image = [cycle imageWithStr:obj];
-                        NSLog(@"---------%d",img);
-                        cycle.imageData[idx] = img;
-                        if (idx == 0)
+                        NSLog(@"%ld---------%@", idx, img);
+                        
+                        for (UIImageView *imgView in cycle.scrollView.subviews)
                         {
-                            UIImageView *imgView = cycle.scrollView.subviews[2];
-                            imgView.image = img;
-                        }
-                        else if (idx == 1)
-                        {
-                            UIImageView *imgView = cycle.scrollView.subviews[3];
-                            imgView.image = img;
-                        }
-                        else if (idx == 2)
-                        {
-                            UIImageView *imgView = cycle.scrollView.subviews[4];
-                            imgView.image = img;
+                            if (imgView.tag == idx)
+                            {
+                                imgView.image = img;
+                            }
                         }
                     });
-                    
                 }
             }
         }];
@@ -189,25 +181,19 @@
 
     return cycle;
 }
-- (UIImage *)imageWithStr:(NSString *)str
+//下载图片
+- (UIImage *)downloadImageWithStr:(NSString *)str
 {
-    
     NSURL * url = [NSURL URLWithString:str];
     NSData * data = [NSData dataWithContentsOfURL:url];
     UIImage * img = [UIImage imageWithData:data];
-    
-//    UIImage *theImage = NULL;
-//    NSString *imageFileName = [BT_strings getFileNameFromURL:theURL];
-//    NSData *imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:theURL]];
-//    theImage = [[UIImage alloc] initWithData:imageData];
-//    [BT_fileManager saveImageToFile:theImage fileName:imageFileName];
-//    return theImage;
     if (img)
     {
         return img;
     }
     return [UIImage imageNamed:@"placeholder"];
 }
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     if (scrollView.contentOffset.x >= (ThisViewWidth * 3) || scrollView.contentOffset.x <= ThisViewWidth)
@@ -223,9 +209,16 @@
             UIImageView *imageView4 = arr[4];
             
             imageView0.image = imageView1.image;
+            imageView0.tag = imageView1.tag;
+            
             imageView1.image = imageView2.image;
+            imageView1.tag = imageView2.tag;
+            
             imageView2.image = imageView3.image;
+            imageView2.tag = imageView3.tag;
+            
             imageView3.image = imageView4.image;
+            imageView3.tag = imageView4.tag;
 
             if (_centreViewIndex >= _imageData.count)
             {
@@ -240,6 +233,7 @@
             }
             
             imageView4.image = _imageData[ind];
+            imageView4.tag = ind;
 
         }
         else if(scrollView.contentOffset.x <= ThisViewWidth)
@@ -252,9 +246,16 @@
             UIImageView *imageView4 = arr[4];
             
             imageView4.image = imageView3.image;
+            imageView4.tag = imageView3.tag;
+            
             imageView3.image = imageView2.image;
+            imageView3.tag = imageView2.tag;
+            
             imageView2.image = imageView1.image;
+            imageView2.tag = imageView1.tag;
+            
             imageView1.image = imageView0.image;
+            imageView1.tag = imageView0.tag;
             
             _centreViewIndex --;
             
@@ -270,6 +271,7 @@
                 ind = ind + _imageData.count;
             }
             imageView0.image = _imageData[ind];
+            imageView0.tag = ind;
         }
         
         _pageControl.currentPage = _centreViewIndex;

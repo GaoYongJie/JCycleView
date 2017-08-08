@@ -19,7 +19,7 @@
 {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    
+
     NSArray *array = @[
 //                       @"1",
 //                       @"h1.jpg",
