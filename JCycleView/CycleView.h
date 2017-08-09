@@ -10,8 +10,19 @@
 
 @interface CycleView : UIView
 
-+ (instancetype)cycleVieWithFrame:(CGRect)frame localImageArray:(NSArray *)imageArray;
+/** block方式监听点击 */
+@property (nonatomic, copy) void (^clickItemBlock)(NSInteger currentIndex);
 
-+ (instancetype)cycleVieWithFrame:(CGRect)frame urlArray:(NSArray *)urlArray;
+/** block方式监听滚动 */
+@property (nonatomic, copy) void (^itemDidScrollBlock)(NSInteger currentIndex);
+
+/** 滚动时间间隔 */
+@property (nonatomic, assign) CGFloat scrollTimeInterval;
+
+/** 占位图 */
+@property (nonatomic, strong) UIImage * placeholderImage;
+
+
++ (instancetype)cycleVieWithFrame:(CGRect)frame localImageArray:(NSArray *)imageArray placeholderImage:(UIImage *)placeholderImage;
 
 @end

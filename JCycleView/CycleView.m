@@ -8,22 +8,28 @@
 
 #import "CycleView.h"
 #import "UIImageView+WebCache.h"
+
 #define ThisViewWidth      (self.bounds.size.width)
+
 #define ThisViewHeight     (self.bounds.size.height)
 
-#define ScreenWidth         ([UIScreen mainScreen].bounds.size.width)
-#define ScreenHeight        ([UIScreen mainScreen].bounds.size.height)
 @interface CycleView () <UIScrollViewDelegate>
-//滚动视图上放5个imageView
+
+//滚动视图 用于放五个imageview
 @property (nonatomic, strong) UIScrollView   * scrollView;
 
-@property (nonatomic, strong) NSMutableArray        * imageData;
+//存放image对象
+@property (nonatomic, strong) NSMutableArray * imageData;
 
 @property (nonatomic, strong) UIPageControl  * pageControl;
 
-@property (nonatomic, strong) NSTimer        * timer;
+//计时器
+@property (nonatomic, weak) NSTimer          * timer;
 
-@property (nonatomic, assign) NSInteger        centreViewIndex;
+/**
+ *当前索引
+ */
+@property (nonatomic, assign) NSInteger        currentIndex;
 
 @end
 
@@ -34,29 +40,36 @@
 {
     if (self = [super initWithFrame:frame])
     {
+        [self initialization];
+        
         [self addSubview:self.scrollView];
 
         [self addSubview:self.pageControl];
-        _centreViewIndex = 0;
-//        [self makeupScrollView];
-        _timer = [NSTimer timerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            [_scrollView setContentOffset:CGPointMake(self.frame.size.width * 3, 0) animated:YES];
-        }];
-        [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
         
-        UIButton * btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
-        [btn addTarget:self action:@selector(clickBtn) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:btn];
+        _currentIndex = 0;
+        
+        [self setupTimer];
+
     }
     return self;
 }
-- (void)clickBtn
+/** 设置默认参数 */
+- (void)initialization
 {
-//    [_timer  setFireDate:[NSDate distantFuture]];
-    [_timer invalidate];
-    _timer = nil;
+    _scrollTimeInterval = 5;
 }
 
+- (void)setScrollTimeInterval:(CGFloat)scrollTimeInterval
+{
+    _scrollTimeInterval = scrollTimeInterval;
+    [self setupTimer];
+}
+- (void)setPlaceholderImage:(UIImage *)placeholderImage
+{
+    _placeholderImage = placeholderImage;
+    
+    
+}
 
 - (void)makeupScrollView
 {
@@ -68,10 +81,21 @@
         imageView.image = _imageData[[self returnImage:index]];//[self returnImage:index];
         NSLog(@"tag ========== %ld",[self returnImage:index]);
         imageView.tag = [self returnImage:index];
+        imageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickImage)];
+        [imageView addGestureRecognizer:tap];
         [self.scrollView addSubview:imageView];
         
     }
     _pageControl.numberOfPages = _imageData.count;
+}
+
+- (void)clickImage
+{
+    if (self.clickItemBlock)
+    {
+        self.clickItemBlock(_currentIndex);
+    }
 }
 //根据输入的位置，返回取数组的下标
 // -2 -1 0 1 2
@@ -122,29 +146,17 @@
     }
     return _scrollView;
 }
-+ (instancetype)cycleVieWithFrame:(CGRect)frame urlArray:(NSArray *)urlArray
-{
-    CycleView *cycle = [[CycleView alloc] initWithFrame:frame];
-    cycle.imageData = [NSMutableArray arrayWithCapacity:urlArray.count];
-    [urlArray enumerateObjectsUsingBlock:^(NSString* obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//        NSURL * url = [NSURL URLWithString:[obj stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-        
-    }];
-    
-    [cycle makeupScrollView];
 
-    return cycle;
-}
-
-+ (instancetype)cycleVieWithFrame:(CGRect)frame localImageArray:(NSArray *)imageArray
++ (instancetype)cycleVieWithFrame:(CGRect)frame localImageArray:(NSArray *)imageArray placeholderImage:(UIImage *)placeholderImage
 {
     CycleView *cycle = [[CycleView alloc] initWithFrame:frame];
     cycle.imageData = [NSMutableArray arrayWithCapacity:imageArray.count];
-    
+    cycle.placeholderImage = placeholderImage;
     [imageArray enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([obj hasPrefix:@"http"])
         {
-            [cycle.imageData addObject:[UIImage imageNamed:@"placeholder"]];
+            [cycle.imageData addObject:cycle.placeholderImage];
+//            [cycle.imageData addObject:[UIImage imageNamed:@"placeholder"]];
         }
         else
         {
@@ -160,6 +172,10 @@
             {
                 UIImage * img = [cycle downloadImageWithStr:obj];
                 cycle.imageData[idx] = img;
+                if (!img)
+                {
+                    NSLog(@"图片为空");
+                }
                 
                 if (img)
                 {
@@ -185,13 +201,49 @@
 - (UIImage *)downloadImageWithStr:(NSString *)str
 {
     NSURL * url = [NSURL URLWithString:str];
-    NSData * data = [NSData dataWithContentsOfURL:url];
+    NSError * error = nil;
+    NSData * data = [NSData dataWithContentsOfURL:url options:0 error:&error];
+    
     UIImage * img = [UIImage imageWithData:data];
+
     if (img)
     {
         return img;
     }
     return [UIImage imageNamed:@"placeholder"];
+}
+
+- (void)setupTimer
+{
+    [self invalidateTimer];
+    NSTimer *timer = [NSTimer timerWithTimeInterval:_scrollTimeInterval repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [_scrollView setContentOffset:CGPointMake(self.frame.size.width * 3, 0) animated:YES];
+    }];
+    _timer = timer;
+//    NSDefaultRunLoopMode  模式在滑动scrollView的时候会暂停计时器
+//    UITrackingRunLoopMode  NSRunLoopCommonModes 不会暂停计时器
+    [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
+}
+- (void)invalidateTimer
+{
+    [_timer invalidate];
+    _timer = nil;
+}
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    [self invalidateTimer];
+}
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    [self setupTimer];
+}
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+{
+    if (self.itemDidScrollBlock)
+    {
+        self.itemDidScrollBlock(_currentIndex);
+    }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -200,7 +252,7 @@
     {
         if (scrollView.contentOffset.x >= (ThisViewWidth * 3))
         {
-            _centreViewIndex++;
+            _currentIndex++;
             NSArray * arr = scrollView.subviews;
             UIImageView *imageView0 = arr[0];
             UIImageView *imageView1 = arr[1];
@@ -220,12 +272,12 @@
             imageView3.image = imageView4.image;
             imageView3.tag = imageView4.tag;
 
-            if (_centreViewIndex >= _imageData.count)
+            if (_currentIndex >= _imageData.count)
             {
-                _centreViewIndex = 0;
+                _currentIndex = 0;
             }
             
-            NSInteger ind = _centreViewIndex + 2;
+            NSInteger ind = _currentIndex + 2;
             
             if (ind >= _imageData.count)
             {
@@ -257,14 +309,14 @@
             imageView1.image = imageView0.image;
             imageView1.tag = imageView0.tag;
             
-            _centreViewIndex --;
+            _currentIndex --;
             
-            if (_centreViewIndex < 0)
+            if (_currentIndex < 0)
             {
-                _centreViewIndex = _imageData.count - 1;
+                _currentIndex = _imageData.count - 1;
             }
             
-            NSInteger ind = _centreViewIndex - 2;
+            NSInteger ind = _currentIndex - 2;
             
             if (ind < 0)
             {
@@ -274,7 +326,7 @@
             imageView0.tag = ind;
         }
         
-        _pageControl.currentPage = _centreViewIndex;
+        _pageControl.currentPage = _currentIndex;
         
         [scrollView setContentOffset:CGPointMake(ThisViewWidth * 2, 0)];
         
