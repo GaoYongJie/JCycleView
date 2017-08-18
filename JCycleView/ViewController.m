@@ -11,6 +11,7 @@
 
 @interface ViewController ()
 
+@property (nonatomic, weak) CycleView * cycle;
 @end
 
 @implementation ViewController
@@ -31,20 +32,28 @@
                        @"http://c.hiphotos.baidu.com/image/w%3D400/sign=c2318ff84334970a4773112fa5c8d1c0/b7fd5266d0160924c1fae5ccd60735fae7cd340d.jpg",
                        @"h2.jpg"
                        ];//, , @"h2.jpg", @"h3.jpg", @"h4.jpg"
-    CycleView * cycle = [CycleView cycleVieWithFrame:(CGRect){0, 20, self.view.bounds.size.width, 200} imageArray:array placeholderImage:[UIImage imageNamed:@"placeholder"]];
-    cycle.placeholderImage = [UIImage imageNamed:@""];
-    cycle.clickItemBlock = ^(NSInteger currentIndex) {
+    self.cycle = [CycleView cycleVieWithFrame:(CGRect){0, 20, self.view.bounds.size.width, 200} imageArray:array placeholderImage:[UIImage imageNamed:@"placeholder"]];
+    _cycle.placeholderImage = [UIImage imageNamed:@""];
+    _cycle.clickItemBlock = ^(NSInteger currentIndex) {
         NSLog(@"clickIndex = %ld",currentIndex);
     };
-    cycle.itemDidScrollBlock = ^(NSInteger currentIndex) {
+    _cycle.itemDidScrollBlock = ^(NSInteger currentIndex) {
         NSLog(@"currentIndex  = %ld",currentIndex);
     };
 //    cycle.scrollTimeInterval = 1;
-    [self.view addSubview:cycle];
-    
+    [self.view addSubview:_cycle];
+    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 300, 50, 50)];
+    [self.view addSubview:btn];
+    [btn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
+    btn.backgroundColor = [UIColor redColor];
 }
 
-
+- (void)click
+{
+    CycleView *p = [[CycleView alloc] init];
+    p.placeholderImage = [UIImage new];
+    p = nil;
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

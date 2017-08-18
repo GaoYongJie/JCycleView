@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E8037BD1F46E2CC0056F843 /* CycleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E8037BC1F46E2CC0056F843 /* CycleView.m */; };
 		3EF071E11F32F93600B64503 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EF071E01F32F93600B64503 /* main.m */; };
 		3EF071E41F32F93600B64503 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EF071E31F32F93600B64503 /* AppDelegate.m */; };
 		3EF071E71F32F93600B64503 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EF071E61F32F93600B64503 /* ViewController.m */; };
 		3EF071EA1F32F93600B64503 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3EF071E81F32F93600B64503 /* Main.storyboard */; };
 		3EF071EC1F32F93600B64503 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3EF071EB1F32F93600B64503 /* Assets.xcassets */; };
 		3EF071EF1F32F93600B64503 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3EF071ED1F32F93600B64503 /* LaunchScreen.storyboard */; };
-		3EF071F81F32FAE800B64503 /* CycleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EF071F71F32FAE800B64503 /* CycleView.m */; };
 		3EF071FD1F3300CF00B64503 /* h1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3EF071F91F3300CF00B64503 /* h1.jpg */; };
 		3EF071FE1F3300CF00B64503 /* h3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3EF071FA1F3300CF00B64503 /* h3.jpg */; };
 		3EF071FF1F3300CF00B64503 /* h2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3EF071FB1F3300CF00B64503 /* h2.jpg */; };
@@ -42,6 +42,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3E8037BB1F46E2CC0056F843 /* CycleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CycleView.h; sourceTree = "<group>"; };
+		3E8037BC1F46E2CC0056F843 /* CycleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CycleView.m; sourceTree = "<group>"; };
 		3EF071DC1F32F93600B64503 /* JCycleView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JCycleView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EF071E01F32F93600B64503 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		3EF071E21F32F93600B64503 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -52,8 +54,6 @@
 		3EF071EB1F32F93600B64503 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3EF071EE1F32F93600B64503 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3EF071F01F32F93600B64503 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3EF071F61F32FAE800B64503 /* CycleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CycleView.h; sourceTree = "<group>"; };
-		3EF071F71F32FAE800B64503 /* CycleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CycleView.m; sourceTree = "<group>"; };
 		3EF071F91F3300CF00B64503 /* h1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = h1.jpg; sourceTree = "<group>"; };
 		3EF071FA1F3300CF00B64503 /* h3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = h3.jpg; sourceTree = "<group>"; };
 		3EF071FB1F3300CF00B64503 /* h2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = h2.jpg; sourceTree = "<group>"; };
@@ -133,8 +133,8 @@
 				3EF071E31F32F93600B64503 /* AppDelegate.m */,
 				3EF071E51F32F93600B64503 /* ViewController.h */,
 				3EF071E61F32F93600B64503 /* ViewController.m */,
-				3EF071F61F32FAE800B64503 /* CycleView.h */,
-				3EF071F71F32FAE800B64503 /* CycleView.m */,
+				3E8037BB1F46E2CC0056F843 /* CycleView.h */,
+				3E8037BC1F46E2CC0056F843 /* CycleView.m */,
 				3EF072051F34469300B64503 /* SDWebImage */,
 				3EF072031F33235100B64503 /* 1.png */,
 				3EF072011F33052300B64503 /* placeholder@2x.png */,
@@ -299,8 +299,8 @@
 				3EF072311F34469300B64503 /* SDImageCacheConfig.m in Sources */,
 				3EF072351F34469300B64503 /* SDWebImageDownloaderOperation.m in Sources */,
 				3EF0722F1F34469300B64503 /* NSImage+WebCache.m in Sources */,
+				3E8037BD1F46E2CC0056F843 /* CycleView.m in Sources */,
 				3EF072381F34469300B64503 /* UIButton+WebCache.m in Sources */,
-				3EF071F81F32FAE800B64503 /* CycleView.m in Sources */,
 				3EF072371F34469300B64503 /* SDWebImagePrefetcher.m in Sources */,
 				3EF072341F34469300B64503 /* SDWebImageDownloader.m in Sources */,
 				3EF0722D1F34469300B64503 /* README.md in Sources */,

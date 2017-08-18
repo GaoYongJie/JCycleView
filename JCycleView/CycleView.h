@@ -22,6 +22,8 @@
 /** 占位图 */
 @property (nonatomic, strong) UIImage * placeholderImage;
 
+@property (nonatomic, copy) NSArray * imageArray;
+
 /** 数组中可同时传入 本地图片名称 和 图片url */
 + (instancetype)cycleVieWithFrame:(CGRect)frame imageArray:(NSArray *)imageArray placeholderImage:(UIImage *)placeholderImage;
 
