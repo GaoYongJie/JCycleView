@@ -31,7 +31,7 @@
                        @"http://c.hiphotos.baidu.com/image/w%3D400/sign=c2318ff84334970a4773112fa5c8d1c0/b7fd5266d0160924c1fae5ccd60735fae7cd340d.jpg",
                        @"h2.jpg"
                        ];//, , @"h2.jpg", @"h3.jpg", @"h4.jpg"
-    CycleView * cycle = [CycleView cycleVieWithFrame:(CGRect){0, 20, self.view.bounds.size.width, 200} localImageArray:array placeholderImage:[UIImage imageNamed:@"placeholder"]];
+    CycleView * cycle = [CycleView cycleVieWithFrame:(CGRect){0, 20, self.view.bounds.size.width, 200} imageArray:array placeholderImage:[UIImage imageNamed:@"placeholder"]];
     cycle.placeholderImage = [UIImage imageNamed:@""];
     cycle.clickItemBlock = ^(NSInteger currentIndex) {
         NSLog(@"clickIndex = %ld",currentIndex);

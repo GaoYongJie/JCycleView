@@ -15,20 +15,19 @@
 
 @interface CycleView () <UIScrollViewDelegate>
 
-//滚动视图 用于放五个imageview
+/** 滚动视图 用于放五个imageview */
 @property (nonatomic, strong) UIScrollView   * scrollView;
 
-//存放image对象
+/** 存放image对象 */
 @property (nonatomic, strong) NSMutableArray * imageData;
+
 
 @property (nonatomic, strong) UIPageControl  * pageControl;
 
-//计时器
+/** 计时器 */
 @property (nonatomic, weak) NSTimer          * timer;
 
-/**
- *当前索引
- */
+/** 当前索引 */
 @property (nonatomic, assign) NSInteger        currentIndex;
 
 @end
@@ -67,8 +66,6 @@
 - (void)setPlaceholderImage:(UIImage *)placeholderImage
 {
     _placeholderImage = placeholderImage;
-    
-    
 }
 
 - (void)makeupScrollView
@@ -85,7 +82,6 @@
         UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickImage)];
         [imageView addGestureRecognizer:tap];
         [self.scrollView addSubview:imageView];
-        
     }
     _pageControl.numberOfPages = _imageData.count;
 }
@@ -147,7 +143,7 @@
     return _scrollView;
 }
 
-+ (instancetype)cycleVieWithFrame:(CGRect)frame localImageArray:(NSArray *)imageArray placeholderImage:(UIImage *)placeholderImage
++ (instancetype)cycleVieWithFrame:(CGRect)frame imageArray:(NSArray *)imageArray placeholderImage:(UIImage *)placeholderImage
 {
     CycleView *cycle = [[CycleView alloc] initWithFrame:frame];
     cycle.imageData = [NSMutableArray arrayWithCapacity:imageArray.count];
@@ -181,7 +177,6 @@
                 {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         NSLog(@"%ld---------%@", idx, img);
-                        
                         for (UIImageView *imgView in cycle.scrollView.subviews)
                         {
                             if (imgView.tag == idx)
@@ -210,7 +205,7 @@
     {
         return img;
     }
-    return [UIImage imageNamed:@"placeholder"];
+    return _placeholderImage;
 }
 
 - (void)setupTimer

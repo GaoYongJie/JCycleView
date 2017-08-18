@@ -478,6 +478,7 @@
 				3EF071F51F32F93600B64503 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
