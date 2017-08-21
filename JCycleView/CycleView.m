@@ -19,10 +19,6 @@
 @property (nonatomic, strong) UIScrollView   * scrollView;
 
 
-
-
-@property (nonatomic, strong) UIPageControl  * pageControl;
-
 /** 计时器 */
 @property (nonatomic, weak) NSTimer          * timer;
 
@@ -31,6 +27,8 @@
 
 /** 存放image对象 */
 @property (nonatomic, strong) NSMutableArray * imageData;
+
+@property (nonatomic, strong) UIPageControl  * pageControl;
 
 @end
 
@@ -41,11 +39,11 @@
 {
     if (self = [super initWithFrame:frame])
     {
-        [self initialization];
-        
         [self addSubview:self.scrollView];
 
         [self addSubview:self.pageControl];
+        
+        [self initialization];
         
         _currentIndex = 0;
     }
@@ -55,6 +53,8 @@
 - (void)initialization
 {
     _scrollTimeInterval = 3;
+    _pageControl.pageIndicatorTintColor = [UIColor whiteColor];
+    _pageControl.currentPageIndicatorTintColor = [UIColor redColor];
 }
 
 - (void)setScrollTimeInterval:(CGFloat)scrollTimeInterval
@@ -62,30 +62,21 @@
     _scrollTimeInterval = scrollTimeInterval;
     [self setupTimer];
 }
-- (void)setPlaceholderImage:(UIImage *)placeholderImage
+
+- (void)fillImage
 {
-    _placeholderImage = placeholderImage;
-}
-//初始化scrollView
-- (void)makeupScrollView
-{
-    NSInteger n = 0;
-    for (NSInteger index = -2; index < 3; index ++)
+    NSArray * tempArr = [_scrollView subviews];
+    for (NSInteger index = -2, n = 0; index < 3; index ++, n++)
     {
-        UIImageView * imageView = [[UIImageView alloc] initWithFrame:(CGRect){n * ThisViewWidth, 0, ThisViewWidth, ThisViewHeight}];
-        imageView.backgroundColor = [UIColor whiteColor];
-        n ++;
-//        imageView.image = _imageData[[self returnImage:index]];//[self returnImage:index];
-        imageView.image = [self imageDataAtIndex:[self returnImage:index]];
-        imageView.tag = [self returnImage:index];
-        imageView.userInteractionEnabled = YES;
-        UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickImage)];
-        [imageView addGestureRecognizer:tap];
-        [self.scrollView addSubview:imageView];
+        UIImageView *tempImageView = (UIImageView *)tempArr[n];
+        tempImageView.image = [self imageDataAtIndex:[self returnImage:index]];
+        tempImageView.tag = [self returnImage:index];
     }
     _pageControl.numberOfPages = _imageData.count;
+    _pageControl.currentPage = 0;
+    _currentIndex = 0;
+    [_scrollView setContentOffset:CGPointMake(ThisViewWidth * 2, 0)];
 }
-
 - (void)clickImage
 {
     if (self.clickItemBlock)
@@ -113,7 +104,7 @@
     {
         index -= 2;
     }
-    return index;//[UIImage imageNamed:_imageData[]];
+    return index;
 }
 
 - (UIPageControl *)pageControl
@@ -124,8 +115,7 @@
         pageControl.currentPage = 0;
         pageControl.userInteractionEnabled = NO;
         pageControl.hidesForSinglePage = YES;
-        pageControl.pageIndicatorTintColor = [UIColor whiteColor];
-        pageControl.currentPageIndicatorTintColor = [UIColor redColor];
+
         self.pageControl = pageControl;
     }
     return _pageControl;
@@ -140,13 +130,20 @@
         tempScrollView.clipsToBounds = YES;
         tempScrollView.backgroundColor = [UIColor lightGrayColor];
         tempScrollView.contentSize = (CGSize){ThisViewWidth * 5, ThisViewHeight};
-        tempScrollView.contentOffset = CGPointMake(ThisViewWidth * 2, 0);
         tempScrollView.pagingEnabled = YES;
         tempScrollView.delegate = self;
         tempScrollView.showsHorizontalScrollIndicator = NO;
         tempScrollView.showsVerticalScrollIndicator = NO;
+        for (NSInteger index = 0; index < 5; index ++)
+        {
+            UIImageView * imageView = [[UIImageView alloc] initWithFrame:(CGRect){index * ThisViewWidth, 0, ThisViewWidth, ThisViewHeight}];
+            imageView.backgroundColor = [UIColor whiteColor];
+            imageView.userInteractionEnabled = YES;
+            UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickImage)];
+            [imageView addGestureRecognizer:tap];
+            [tempScrollView addSubview:imageView];
+        }
         self.scrollView = tempScrollView;
-        
     }
     return _scrollView;
 }
@@ -154,45 +151,66 @@
 + (instancetype)cycleVieWithFrame:(CGRect)frame imageArray:(NSArray *)imageArray placeholderImage:(UIImage *)placeholderImage
 {
     CycleView *cycle = [[CycleView alloc] initWithFrame:frame];
-    cycle.imageData = [NSMutableArray arrayWithCapacity:imageArray.count];
+    
     //设置占位图
     placeholderImage ? (cycle.placeholderImage = placeholderImage) : (cycle.placeholderImage = UIImage.new);
     
+    cycle.imageArray = imageArray;
+    
+    return cycle;
+}
+- (void)setImageArray:(NSArray *)imageArray
+{
+    _imageArray = [imageArray copy];
+    [self resetData];
+}
+
+- (void)resetData
+{
+    _imageData = [NSMutableArray array];
+    [self setupImageData];
+    [self asynDownloadImage];
+    [self fillImage];
+    [self setupTimer];
+}
+- (void)setCustomCurrentPageIndicatorTintColor:(UIColor *)customCurrentPageIndicatorTintColor
+{
+    _customCurrentPageIndicatorTintColor = customCurrentPageIndicatorTintColor;
+    _pageControl.pageIndicatorTintColor = _customCurrentPageIndicatorTintColor;
+}
+- (void)setCustomPageIndicatorTintColor:(UIColor *)customPageIndicatorTintColor
+{
+    _customPageIndicatorTintColor = customPageIndicatorTintColor;
+    _pageControl.pageIndicatorTintColor = _customPageIndicatorTintColor;
+}
+- (void)setupImageData
+{
     //初始化图片
-    [imageArray enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        
+    [_imageArray enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([obj hasPrefix:@"http"])
         {
             //如果是需要下载的图片，则先添加占位图
-            [cycle.imageData addObject:cycle.placeholderImage];
+            [_imageData addObject:_placeholderImage];
         }
         else
         {
             //直接将加入到数组中
-            [cycle.imageData addObject:[UIImage imageNamed:obj]];
+            [_imageData addObject:[UIImage imageNamed:obj]];
         }
     }];
-    
-    
-    
-    //初始化scrollView
-    [cycle makeupScrollView];
-    
-    [cycle setupImageWithArray:imageArray];
-    
-    [cycle setupTimer];
-    
-    return cycle;
+
 }
-- (void)setupImageWithArray:(NSArray *)imageArray
+
+
+- (void)asynDownloadImage
 {
     //异步下载图片
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0) , ^{
-        [imageArray enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) , ^{
+        [_imageArray enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([obj hasPrefix:@"http"])
             {
                 UIImage * img = [self downloadImageWithStr:obj];
-                
+
                 if (img)
                 {
                     _imageData[idx] = img;
@@ -211,7 +229,6 @@
             }
         }];
     });
-    
 }
 //下载图片
 - (UIImage *)downloadImageWithStr:(NSString *)str
@@ -243,10 +260,7 @@
     [_timer invalidate];
     _timer = nil;
 }
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-{
-    [self invalidateTimer];
-}
+
 
 #pragma mark - Scroll View Delegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -336,15 +350,15 @@
         [scrollView setContentOffset:CGPointMake(ThisViewWidth * 2, 0)];
     }
 }
-
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    [self invalidateTimer];
+}
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     [self setupTimer];
 }
-//将要减速
-- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
-{
-}
+
 //结束减速
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
@@ -362,7 +376,6 @@
         self.itemDidScrollBlock(_currentIndex);
     }
 }
-
 
 - (UIImage *)imageDataAtIndex:(NSUInteger)index
 {

@@ -32,22 +32,34 @@
                        @"http://c.hiphotos.baidu.com/image/w%3D400/sign=c2318ff84334970a4773112fa5c8d1c0/b7fd5266d0160924c1fae5ccd60735fae7cd340d.jpg",
                        @"h2.jpg"
                        ];//, , @"h2.jpg", @"h3.jpg", @"h4.jpg"
-    self.cycle = [CycleView cycleVieWithFrame:(CGRect){0, 20, self.view.bounds.size.width, 200} imageArray:array placeholderImage:[UIImage imageNamed:@"placeholder"]];
-    _cycle.placeholderImage = [UIImage imageNamed:@""];
-    _cycle.clickItemBlock = ^(NSInteger currentIndex) {
-        NSLog(@"clickIndex = %ld",currentIndex);
-    };
-    _cycle.itemDidScrollBlock = ^(NSInteger currentIndex) {
-        NSLog(@"currentIndex  = %ld",currentIndex);
-    };
+    self.cycle = [CycleView cycleVieWithFrame:(CGRect){0, 20, self.view.bounds.size.width, 200}
+                                   imageArray:array
+                             placeholderImage:[UIImage imageNamed:@"placeholder"]];
+//    _cycle.placeholderImage = [UIImage imageNamed:@""];
+//    _cycle.clickItemBlock = ^(NSInteger currentIndex) {
+//        NSLog(@"clickIndex = %ld",currentIndex);
+//    };
+//    _cycle.itemDidScrollBlock = ^(NSInteger currentIndex) {
+//        NSLog(@"currentIndex  = %ld",currentIndex);
+//    };
 //    cycle.scrollTimeInterval = 1;
     [self.view addSubview:_cycle];
-    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 300, 50, 50)];
-    [self.view addSubview:btn];
-    [btn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
-    btn.backgroundColor = [UIColor redColor];
+//    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 300, 50, 50)];
+//    [self.view addSubview:btn];
+//    [btn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
+//    btn.backgroundColor = [UIColor redColor];
+    
+    [self performSelector:@selector(delayDo) withObject:nil afterDelay:10.0f];
 }
-
+- (void)delayDo
+{
+    _cycle.scrollTimeInterval = 5;
+    _cycle.customPageIndicatorTintColor = [UIColor blueColor];
+//    _cycle.pageControl.currentPageIndicatorTintColor = [UIColor greenColor];
+    _cycle.imageArray = @[@"http://c.hiphotos.baidu.com/image/w%3D400/sign=c2318ff84334970a4773112fa5c8d1c0/b7fd5266d0160924c1fae5ccd60735fae7cd340d.jpg",
+                          @"001.png",@"002.png",@"003.png"];
+//    _cycle.pageControl.numberOfPages = 10;
+}
 - (void)click
 {
     CycleView *p = [[CycleView alloc] init];
